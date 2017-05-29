@@ -239,7 +239,9 @@ void pthreads_current_thread(zval *return_value) {
 
 /* {{{ */
 int pthreads_connect(pthreads_object_t* source, pthreads_object_t* destination) {
-	if (source && destination) {
+	pthreads_ident_t destCreator = destination->creator;
+    
+        if (source && destination) {
 		if (PTHREADS_IS_NOT_CONNECTION(destination)) {
 			if (!PTHREADS_IS_SOCKET(destination)) {
 				pthreads_store_free(destination->store.props);
@@ -255,7 +257,8 @@ int pthreads_connect(pthreads_object_t* source, pthreads_object_t* destination) 
 		}
 
 		memcpy(destination, source, sizeof(pthreads_object_t) - sizeof(zend_object));
-
+		
+		destination->creator = destCreator;
 		destination->scope |= PTHREADS_SCOPE_CONNECTION;
 
 		if (destination->std.properties)
